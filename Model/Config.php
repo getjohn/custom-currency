@@ -40,6 +40,7 @@ class Config
         \Psr\Log\LoggerInterface $logger,
         \Magento\Framework\App\State $appState,
         \Magento\Framework\View\Asset\Repository $assetRepo,
+        \Magento\Framework\App\DeploymentConfig $deploymentConfig,
         $currencies = []
     ) {
         $this->scopeConfig = $scopeConfig;
@@ -50,6 +51,7 @@ class Config
         $this->appState = $appState;
         $this->assetRepo = $assetRepo;
         $this->currencies = $currencies;
+        $this->deploymentConfig = $deploymentConfig;
     }
 
     public static function enableHtml()
@@ -66,6 +68,12 @@ class Config
     {
         if (isset($this->cache['allowed'])) {
             return $this->cache['allowed'];
+        }
+
+        if ($this->deploymentConfig !== null
+            && !$this->deploymentConfig->get('db/connection/default')
+        ) {
+            return [];
         }
 
         $connection = $this->resourceConnection->getConnection();
